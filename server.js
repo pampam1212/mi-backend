@@ -81,6 +81,7 @@ ${mensaje}
   });
 });
 
-app.listen(port, () => {
-  console.log(`Servidor activo en http://localhost:${port}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Servidor activo en el puerto ${PORT}`);
 });
