@@ -4,11 +4,15 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const port = 5000;
 
+// Puerto: usa el que da Render o 5000 por defecto
+const PORT = process.env.PORT || 5000;
+
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
+// Transporter para nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -17,6 +21,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// ✅ Ruta GET para ver si el servidor está funcionando
+app.get('/', (req, res) => {
+  res.send('✅ Backend activo. Usar POST /send-email para enviar mensajes.');
+});
+
+// Ruta principal para enviar el formulario
 app.post('/send-email', (req, res) => {
   const { nombre, correo, areaCode, telefono, mensaje } = req.body;
 
@@ -24,7 +34,7 @@ app.post('/send-email', (req, res) => {
     ? `Teléfono: (${areaCode}) ${telefono}\n`
     : 'Teléfono: (no ingresado)\n';
 
-  // Mensaje para la organización
+  // Correo para la organización
   const mailToOrg = {
     from: 'comunicacioneshdclourdes@gmail.com',
     to: 'comunicacioneshdclourdes@gmail.com',
@@ -41,7 +51,7 @@ ${mensaje}
     `.trim()
   };
 
-  // Mensaje para el usuario (con HTML)
+  // Correo para el usuario
   const mailToUser = {
     from: 'comunicacioneshdclourdes@gmail.com',
     to: correo,
@@ -63,7 +73,7 @@ ${mensaje}
     `
   };
 
-  // Enviar los correos
+  // Enviar correos
   transporter.sendMail(mailToOrg, (errorOrg) => {
     if (errorOrg) {
       console.error('Error al enviar a la organización:', errorOrg);
@@ -81,7 +91,7 @@ ${mensaje}
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor activo en el puerto ${PORT}`);
 });
